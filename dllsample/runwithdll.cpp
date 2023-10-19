@@ -23,6 +23,12 @@ std::queue<std::string> cmds;
 
 int main()
 {
+    std::mutex m;
+
+    cmds.push("1");
+    cmds.push("2");
+    cmds.push("3");
+
     Pipe pipe;
 
   std::filesystem::path dll_path = DLL_NAME;
@@ -36,13 +42,15 @@ int main()
   //CLIENT_APP_NAME 
     pipe.Open(ClientAppAbsolutePath.c_str(), DllAbsolutePath.c_str() );
 
-    std::jthread pipe_sender([&pipe](std::stop_token stoken) {
+    std::jthread pipe_sender([&pipe,&m](std::stop_token stoken) {
         char buf[16384] = { 0 };
         
         while (!stoken.stop_requested()) {
             if (!cmds.empty() ) {
-                sprintf(buf, "%s\n", cmds.back().c_str() );
+                m.lock();
+                sprintf(buf, "%s\n", cmds.front().c_str() );
                 cmds.pop();
+                m.unlock();
                 auto sz = strlen(buf);
                 pipe.Write(buf, sz);                                
             }
@@ -74,7 +82,10 @@ int main()
     {
         break;
     }
+    m.lock();
     cmds.push(s);
+    m.unlock();
+    
     }
 
 
