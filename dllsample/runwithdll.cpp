@@ -7,11 +7,15 @@
 #include <chrono>
 #include <mutex>
 #include <thread>
+#include <filesystem>
 using namespace ::std::literals;
 
 
-#define DLL_NAME "Z:\\Projects2022\\detours-cmake\\build\\DEBUG\\dllsample.dll"
-// #define DLL_NAME "Z:\\Projects2022\\detours-cmake\\build\\DEBUG\\traceapi.dll"
+//#define DLL_NAME "dllsample.dll"
+// to view logs run syslog before running this project
+#define DLL_NAME "traceapi.dll"
+#define CLIENT_APP_NAME "dummy.exe"
+// 
  // #define DLL_NAME NULL
 //-------------------------------------------------------------------------
 std::vector<std::string> cmds = {
@@ -25,7 +29,17 @@ std::vector<std::string> cmds = {
 int main()
 {
     Pipe pipe;
-    pipe.Open("dummy", DLL_NAME);
+
+  std::filesystem::path dll_path = DLL_NAME;
+  std::string DllAbsolutePath = std::filesystem::absolute(dll_path).string();
+  std::cout << "Injecting " << DllAbsolutePath << std::endl;
+
+  std::filesystem::path client_app_path = CLIENT_APP_NAME;
+  std::string  ClientAppAbsolutePath = std::filesystem::absolute(client_app_path).string();
+  std::cout << "Into " << ClientAppAbsolutePath << std::endl;
+
+  //CLIENT_APP_NAME 
+    pipe.Open(ClientAppAbsolutePath.c_str(), DllAbsolutePath.c_str() );
 
     std::jthread pipe_sender([&pipe](std::stop_token stoken) {
         char buf[16384] = { 0 };
@@ -54,7 +68,8 @@ int main()
             } while (res > 0);
         }
     });
-    std::this_thread::sleep_for(500s);
+    // let thteads to work
+    std::this_thread::sleep_for(5s);
     std::cout << "------" << std::endl;
     pipe_sender.request_stop();
     pipe_receiver.request_stop();

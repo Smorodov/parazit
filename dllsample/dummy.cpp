@@ -12,7 +12,7 @@ int main()
         std::cin >> s;
         std::cout << " ---> " << s << std::endl;
 
-        //::Beep(200, 1000);
+        ::Beep(200, 100);
     }
     std::cout << "Dummy program ended...\n";
     return 0;
