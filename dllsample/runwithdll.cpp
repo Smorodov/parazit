@@ -8,6 +8,7 @@
 #include <mutex>
 #include <thread>
 #include <filesystem>
+#include <queue>
 using namespace ::std::literals;
 
 
@@ -18,13 +19,7 @@ using namespace ::std::literals;
 // 
  // #define DLL_NAME NULL
 //-------------------------------------------------------------------------
-std::vector<std::string> cmds = {
-    "test1",
-    "test2",
-    "test3",
-    "test4",
-    "quit"
-};
+std::queue<std::string> cmds;
 
 int main()
 {
@@ -43,16 +38,15 @@ int main()
 
     std::jthread pipe_sender([&pipe](std::stop_token stoken) {
         char buf[16384] = { 0 };
-        int i = 0;
+        
         while (!stoken.stop_requested()) {
-            if (i < cmds.size()) {
-                sprintf(buf, "%s\n", cmds[i].c_str());
+            if (!cmds.empty() ) {
+                sprintf(buf, "%s\n", cmds.back().c_str() );
+                cmds.pop();
                 auto sz = strlen(buf);
-                pipe.Write(buf, sz);
-
-                ++i;
-                std::this_thread::sleep_for(0.1s);
+                pipe.Write(buf, sz);                                
             }
+            std::this_thread::sleep_for(0.10ms);
         }
     });
 
@@ -69,7 +63,21 @@ int main()
         }
     });
     // let thteads to work
-    std::this_thread::sleep_for(5s);
+    // std::this_thread::sleep_for(5s);
+    // type quit to quit dummy.exe
+    // type exit to quit this app
+    while(1)
+    {
+    std::string s;
+    std::cin >> s;
+    if(s=="exit")
+    {
+        break;
+    }
+    cmds.push(s);
+    }
+
+
     std::cout << "------" << std::endl;
     pipe_sender.request_stop();
     pipe_receiver.request_stop();
