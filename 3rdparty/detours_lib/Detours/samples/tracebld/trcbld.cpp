@@ -37,7 +37,7 @@
 #define ASSERT_ALWAYS(x)   \
 	do {                                                        \
 		if (!(x)) {                                             \
-			AssertFailed(#x, __FILE__, __LINE__);               \
+			AssertFailed((PCHAR)#x, (PCHAR)__FILE__, __LINE__);               \
 			DebugBreak();                                       \
 		}                                                       \
 	} while (0)

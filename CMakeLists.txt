@@ -14,15 +14,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 # updated microsoft detours library
+
 add_subdirectory(3rdparty)
+
+# add_subdirectory(findfunc_example)
+
 # simple hooking
 add_subdirectory(simple)
+
 # hooking with injection and pipes interprocess communication
 add_subdirectory(dllsample)
 
+ 
 
 
-	foreach (trgt simple dllsample dummy runwithdll withdll traceapi syelogd tracessl)		
+	foreach (trgt simple dllsample dummy runwithdll withdll traceapi syelogd tracemem tracessl dumpe dumpi )		
 		set_target_properties( ${trgt} PROPERTIES  VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${trgt}>")
 	endforeach()
 

@@ -34,7 +34,7 @@
 #define ASSERT_ALWAYS(x)   \
 	do {                                                        \
 		if (!(x)) {                                                 \
-			AssertMessage(#x, __FILE__, __LINE__);              \
+			AssertMessage((PCHAR)#x, (PCHAR)__FILE__, __LINE__);              \
 			DebugBreak();                                       \
 		}                                                           \
 	} while (0)
@@ -1270,8 +1270,8 @@ VOID DetDetach(PVOID *ppbReal, PVOID pbMine, PCHAR psz)
 	}
 }
 
-#define ATTACH(x)       DetAttach(&(PVOID&)Real_##x,Mine_##x,#x)
-#define DETACH(x)       DetDetach(&(PVOID&)Real_##x,Mine_##x,#x)
+#define ATTACH(x)       DetAttach(&(PVOID&)Real_##x,Mine_##x,(PCHAR)#x)
+#define DETACH(x)       DetDetach(&(PVOID&)Real_##x,Mine_##x,(PCHAR)#x)
 
 LONG AttachDetours(VOID)
 {

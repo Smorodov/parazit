@@ -152,7 +152,7 @@ BOOL CloseConnection(PCLIENT pClient)
 			if (!DisconnectNamedPipe(pClient->hPipe))
 			{
 				DWORD error = GetLastError();
-				pClient->LogMessageV("<!-- Error %d in DisconnectNamedPipe. -->\n", error);
+				pClient->LogMessageV((PCHAR)"<!-- Error %d in DisconnectNamedPipe. -->\n", error);
 			}
 			CloseHandle(pClient->hPipe);
 			pClient->hPipe = INVALID_HANDLE_VALUE;
@@ -265,14 +265,14 @@ BOOL DoRead(PCLIENT pClient)
 	}
 	if (error == ERROR_BROKEN_PIPE)
 	{
-		pClient->LogMessageV("<!-- **** ReadFile 002 *** ERROR_BROKEN_PIPE [%d] -->\n", nBytes);
+		pClient->LogMessageV((PCHAR)"<!-- **** ReadFile 002 *** ERROR_BROKEN_PIPE [%d] -->\n", nBytes);
 		CloseConnection(pClient);
 		return TRUE;
 	}
 	else if (error == ERROR_INVALID_HANDLE)
 	{
 		// ?
-		pClient->LogMessageV("<!-- **** ReadFile 002 *** ERROR_INVALID_HANDLE -->\n");
+		pClient->LogMessageV((PCHAR)"<!-- **** ReadFile 002 *** ERROR_INVALID_HANDLE -->\n");
 		// I have no idea why this happens.  Our remedy is to drop the connection.
 		return TRUE;
 	}
@@ -280,11 +280,11 @@ BOOL DoRead(PCLIENT pClient)
 	{
 		if (b)
 		{
-			pClient->LogMessageV("<!-- **** ReadFile 002 succeeded: %d -->\n", error);
+			pClient->LogMessageV((PCHAR)"<!-- **** ReadFile 002 succeeded: %d -->\n", error);
 		}
 		else
 		{
-			pClient->LogMessageV("<!-- **** ReadFile 002 failed: %d -->\n", error);
+			pClient->LogMessageV((PCHAR)"<!-- **** ReadFile 002 failed: %d -->\n", error);
 		}
 		CloseConnection(pClient);
 	}
@@ -311,11 +311,11 @@ DWORD WINAPI WorkerThread(LPVOID pvVoid)
 			{
 				if (GetLastError() == ERROR_BROKEN_PIPE)
 				{
-					pClient->LogMessageV("<!-- Client closed pipe. -->");
+					pClient->LogMessageV((PCHAR)"<!-- Client closed pipe. -->");
 				}
 				else
 				{
-					pClient->LogMessageV("<!-- *** GetQueuedCompletionStatus failed %d -->",
+					pClient->LogMessageV((PCHAR)"<!-- *** GetQueuedCompletionStatus failed %d -->",
 					                     GetLastError());
 				}
 				CloseConnection(pClient);
@@ -343,7 +343,7 @@ DWORD WINAPI WorkerThread(LPVOID pvVoid)
 		{
 			if (nBytes <= offsetof(TBLOG_MESSAGE, szMessage))
 			{
-				pClient->LogMessageV("</t:Process>\n");
+				pClient->LogMessageV((PCHAR)"</t:Process>\n");
 				CloseConnection(pClient);
 				continue;
 			}
